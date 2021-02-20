@@ -8,6 +8,9 @@
     <div>
       {{ counter }}
     </div>
+    <div>
+      <e-text-field label="Hello World" />
+    </div>
   </div>
 </template>
 
@@ -15,10 +18,11 @@
 
 import { ref, watch } from 'vue'
 import EButton from "@/components/atoms/EButton.vue"
+import ETextField from "@/components/atoms/ETextField.vue";
 
 export default {
   name: 'Playground',
-  components: { EButton },
+  components: { ETextField, EButton },
   setup () {
     const counter = ref(0)
 
