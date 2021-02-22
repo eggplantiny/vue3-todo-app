@@ -9,7 +9,13 @@
       {{ counter }}
     </div>
     <div>
-      <e-text-field label="Hello World" />
+      <e-input
+        v-model="value"
+        label="Hello World"
+      />
+    </div>
+    <div>
+      {{ value }}
     </div>
   </div>
 </template>
@@ -18,13 +24,14 @@
 
 import { ref, watch } from 'vue'
 import EButton from "@/components/atoms/EButton.vue"
-import ETextField from "@/components/atoms/ETextField.vue";
+import EInput from "@/components/atoms/EInput.vue";
 
 export default {
   name: 'Playground',
-  components: { ETextField, EButton },
+  components: { EInput, EButton },
   setup () {
     const counter = ref(0)
+    const value = ref('Hello World')
 
     const onClickButton = () => { counter.value += 1 }
 
@@ -36,6 +43,7 @@ export default {
 
     return {
       counter,
+      value,
       onClickButton
     }
   }
