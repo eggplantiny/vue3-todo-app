@@ -1,4 +1,18 @@
+@import "./spacing.scss";
+
 body {
   font-size: 16px;
 }
 
+.d-flex {
+  display: flex;
+  width: 100%;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.justify-space-between {
+  justify-content: space-between;
+}

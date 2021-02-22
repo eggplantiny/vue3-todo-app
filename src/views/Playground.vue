@@ -1,22 +1,13 @@
 <template>
-  <div>
-    <div>
-      <e-button @click="onClickButton">
-        Hello World
-      </e-button>
-    </div>
-    <div>
-      {{ counter }}
-    </div>
-    <div>
-      <e-input
-        v-model="value"
-        label="Hello World"
-      />
-    </div>
-    <div>
-      {{ value }}
-    </div>
+  <div class="d-flex">
+    <e-input
+      v-model="value"
+      class="mr-2"
+      @keydown.enter="hello"
+    />
+    <e-button>
+      Enter
+    </e-button>
   </div>
 </template>
 
@@ -41,10 +32,13 @@ export default {
       }
     })
 
+    const hello = () => { console.log(value.value) }
+
     return {
       counter,
       value,
-      onClickButton
+      onClickButton,
+      hello
     }
   }
 }
