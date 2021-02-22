@@ -21,6 +21,10 @@ $rules: [
   [mt, margin-top],
   [mb, margin-bottom],
   [mr, margin-right],
+  [pl, padding-left],
+  [pr, padding-right],
+  [pt, padding-top],
+  [pb, padding-bottom]
 ];
 
 @each $item in $rules {

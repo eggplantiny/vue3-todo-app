@@ -9,7 +9,7 @@
   </label>
 </template>
 
-<script>
+<script lang="ts">
 import { ref } from 'vue'
 
 export default {
@@ -21,10 +21,8 @@ export default {
       default: ''
     }
   },
-  setup (...params) {
-    const value = ref('')
-
-    console.log(params)
+  setup () {
+    const value = ref <string|number> ('')
     return {
       value
     }
