@@ -30,18 +30,19 @@
 
 import { ref } from 'vue'
 import { useStore } from 'vuex'
-import { key } from '@/store'
 import EButton from '@/components/atoms/EButton.vue'
 import EInput from '@/components/atoms/EInput.vue'
-import  { generateId } from '@/helper/utils'
+import { generateId } from '@/helper/utils'
+
+import { Todo } from '@/@types'
 
 export default {
   name: 'Playground',
   components: { EInput, EButton },
   setup () {
-    const store = useStore(key)
+    const store = useStore()
     const value = ref <string> ('')
-    const todos: Todo[] = store.getters['todos']
+    const todos: Todo[] = store.getters['todo/todos']
 
     const addTodo = () => {
       const todo: Todo = {
@@ -50,11 +51,11 @@ export default {
         complete: false
       }
 
-      store.dispatch('addTodo',todo)
+      store.dispatch('todo/addTodo',todo)
     }
 
     const deleteTodo = (todo: Todo) => {
-      store.dispatch('removeTodo', todo)
+      store.dispatch('todo/removeTodo', todo)
     }
 
     return {
