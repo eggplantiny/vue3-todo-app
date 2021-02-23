@@ -18,6 +18,9 @@
     >
       <div class="pt-2 pb-2">
         {{ todo.text }}
+        <e-button @click="deleteTodo(todo)">
+          Delete
+        </e-button>
       </div>
     </template>
   </div>
@@ -63,11 +66,16 @@ export default {
       store.dispatch('addTodo',todo)
     }
 
+    const deleteTodo = (todo: Todo) => {
+      store.dispatch('removeTodo', todo)
+    }
+
     return {
       counter,
       value,
       onClickButton,
       addTodo,
+      deleteTodo,
       todos
     }
   }
