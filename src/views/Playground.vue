@@ -17,7 +17,7 @@
       :key="index"
     >
       <div class="pt-2 pb-2">
-        {{ todo }}
+        {{ todo.text }}
       </div>
     </template>
   </div>
@@ -25,17 +25,21 @@
 
 <script lang="ts">
 
-import { ref, watch, reactive } from 'vue'
-import EButton from "@/components/atoms/EButton.vue"
-import EInput from "@/components/atoms/EInput.vue"
+import { ref, watch } from 'vue'
+import { useStore } from 'vuex'
+import { key } from '@/store'
+import EButton from '@/components/atoms/EButton.vue'
+import EInput from '@/components/atoms/EInput.vue'
+import  { generateId } from '@/helper/utils'
 
 export default {
   name: 'Playground',
   components: { EInput, EButton },
   setup () {
+    const store = useStore(key)
     const counter = ref <number> (0)
     const value = ref <string> ('Hello World')
-    const todos = reactive <string[]> ([])
+    const todos: Todo[] = store.getters['todos']
 
     const onClickButton = () => { counter.value += 1 }
 
@@ -46,8 +50,17 @@ export default {
     })
 
     const addTodo = () => {
-      const v = value.value
-      todos.push(v)
+      const text = value.value
+      const id = generateId()
+      const complete = false
+
+      const todo: Todo = {
+        text,
+        id,
+        complete
+      }
+
+      store.dispatch('addTodo',todo)
     }
 
     return {
