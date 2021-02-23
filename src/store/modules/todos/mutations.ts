@@ -5,6 +5,7 @@ import { State } from './state'
 export type Mutations <S = State> = {
     ADD_ITEM (state: S, todo: Todo): void;
     REMOVE_TODO (state: S, todo: Todo): void;
+    TOGGLE_TODO (state: S, todo: Todo): void;
 };
 
 export const mutations: MutationTree <State> & Mutations = {
@@ -14,5 +15,11 @@ export const mutations: MutationTree <State> & Mutations = {
     REMOVE_TODO (state: State, todo: Todo) {
         const index = state.todos.findIndex((item: Todo) => item.id === todo.id)
         state.todos.splice(index, 1)
+    },
+    TOGGLE_TODO (state: State, todo: Todo) {
+        const index = state.todos.findIndex((item: Todo) => item.id === todo.id)
+        todo.done = !todo.done
+
+        state.todos.splice(index, 1, todo)
     }
 };
