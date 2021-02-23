@@ -28,7 +28,7 @@
 
 <script lang="ts">
 
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useStore } from 'vuex'
 import { key } from '@/store'
 import EButton from '@/components/atoms/EButton.vue'
@@ -40,27 +40,14 @@ export default {
   components: { EInput, EButton },
   setup () {
     const store = useStore(key)
-    const counter = ref <number> (0)
-    const value = ref <string> ('Hello World')
+    const value = ref <string> ('')
     const todos: Todo[] = store.getters['todos']
 
-    const onClickButton = () => { counter.value += 1 }
-
-    watch(counter, value => {
-      if (value >= 10) {
-        window.alert('Hello World!')
-      }
-    })
-
     const addTodo = () => {
-      const text = value.value
-      const id = generateId()
-      const complete = false
-
       const todo: Todo = {
-        text,
-        id,
-        complete
+        text: value.value,
+        id: generateId(),
+        complete: false
       }
 
       store.dispatch('addTodo',todo)
@@ -71,12 +58,10 @@ export default {
     }
 
     return {
-      counter,
       value,
-      onClickButton,
+      todos,
       addTodo,
-      deleteTodo,
-      todos
+      deleteTodo
     }
   }
 }
