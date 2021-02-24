@@ -4,6 +4,9 @@ export const actions = {
     },
     removeTodo({ commit }, todo) {
         commit('REMOVE_TODO', todo);
+    },
+    toggleTodo({ commit }, todo) {
+        commit('TOGGLE_TODO', todo);
     }
 };
 //# sourceMappingURL=actions.js.map

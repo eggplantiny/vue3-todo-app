@@ -14,6 +14,9 @@
     </div>
     <div class="text-right mt-2">
       <span class="mr-2">
+        Last Action: {{ lastAction }}
+      </span>
+      <span class="mr-2">
         Done: {{ progressCount }}
       </span>
       <span class="mr-2">
@@ -52,13 +55,14 @@
 
 <script lang="ts">
 
-import { ref, computed, watch } from 'vue'
-import { useStore } from 'vuex'
+import {computed, ref, watch} from 'vue'
+import {useStore} from 'vuex'
+
+import {generateId} from '@/helper/utils'
+import {LastAction, Todo} from '@/@types'
+
 import EButton from '@/components/atoms/EButton.vue'
 import EInput from '@/components/atoms/EInput.vue'
-import { generateId } from '@/helper/utils'
-
-import { Todo } from '@/@types'
 
 export default {
   name: 'Playground',
@@ -67,6 +71,7 @@ export default {
     const store = useStore()
     const value = ref <string> ('')
     const todos: Todo[] = store.getters['todo/todos']
+    const lastAction = ref <LastAction> (0)
 
     const addTodo = () => {
       const text = value.value
@@ -85,6 +90,7 @@ export default {
 
       store.dispatch('todo/addTodo',todo)
       value.value = ''
+      lastAction.value = LastAction.ADD
     }
 
     const deleteTodo = (todo: Todo) => {
@@ -95,26 +101,33 @@ export default {
       }
 
       store.dispatch('todo/removeTodo', todo)
+      lastAction.value = LastAction.DELETE
     }
 
     const toggleTodo = (todo: Todo) => {
       store.dispatch('todo/toggleTodo', todo)
+      lastAction.value = LastAction.TOGGLE
     }
 
     const progressCount = computed(() => todos.filter((todo: Todo) => todo.done).length)
     const allCount = computed(() => todos.length)
 
-    // watch(progressCount, () => {
-    //   if (progressCount.value === allCount.value) {
-    //     window.alert('You done all todo!')
-    //   }
-    // })
+    watch(progressCount, () => {
+      if (lastAction.value !== LastAction.TOGGLE) {
+        return
+      }
+
+      if (progressCount.value === allCount.value) {
+        window.alert('You done all todo!')
+      }
+    })
 
     return {
       value,
       todos,
       allCount,
       progressCount,
+      lastAction,
       addTodo,
       deleteTodo,
       toggleTodo
