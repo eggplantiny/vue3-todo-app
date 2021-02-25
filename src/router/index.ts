@@ -9,7 +9,7 @@ const routes: Array<RouteRecordRaw> = [
     component: Todo
   },
   {
-    path: '/Playground',
+    path: '/',
     name: Playground.name,
     component: Playground
   }
