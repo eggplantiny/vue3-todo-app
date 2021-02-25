@@ -5,6 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "clean": "tsc --build --clean",
+    "add-all": "yarn clean && git add .",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint"
   },
