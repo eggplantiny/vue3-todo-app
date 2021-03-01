@@ -55,7 +55,7 @@
 
 <script lang="ts">
 
-import {computed, ref, watch} from 'vue'
+import {computed, ref, watch, onMounted} from 'vue'
 import {useStore} from 'vuex'
 
 import {generateId} from '@/helper/utils'
@@ -63,6 +63,12 @@ import {LastAction, Todo} from '@/@types'
 
 import EButton from '@/components/atoms/EButton.vue'
 import EInput from '@/components/atoms/EInput.vue'
+
+import {
+  createDatabase,
+  createTransition,
+  TransactionHandler
+} from '@/helper/database'
 
 export default {
   name: 'Playground',
@@ -121,6 +127,16 @@ export default {
         window.alert('You done all todo!')
       }
     })
+
+    const transactionHandler = ref(null)
+
+    const initializeDatabase = async () => {
+      const db = await createDatabase()
+      const transaction = await createTransition(db, ['todos'])
+      transactionHandler.value = new TransactionHandler(transaction)
+    }
+
+    onMounted(initializeDatabase)
 
     return {
       value,
