@@ -1,3 +1,5 @@
+//  reference: https://developer.mozilla.org/ko/docs/Web/API/IndexedDB_API/Using_IndexedDB
+//  공부해야할게 많구만 🙄
 
 if (!window.indexedDB) {
     throw Error(`Your browser doesn't support a stable version of IndexedDB. Such and such feature will not be available.`)
@@ -19,7 +21,7 @@ export function createDatabase (): PromiseLike<IDBDatabase> {
     })
 }
 
-export function createTransition (db: IDBDatabase, storeNames: string [] | string, option: IDBTransactionMode = 'readwrite'): IDBTransaction {
+export function createTransition (db: IDBDatabase, storeNames: string | string [], option: IDBTransactionMode = 'readwrite'): IDBTransaction {
     console.log(storeNames, option)
     return db.transaction(storeNames, option)
 }
