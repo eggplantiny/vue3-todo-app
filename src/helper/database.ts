@@ -15,14 +15,17 @@ export function createDatabase (): PromiseLike<IDBDatabase> {
             reject(event)
         }
 
-        request.onsuccess = function () {
-            resolve(request.result)
+        request.onupgradeneeded = function () {
+            const db: IDBDatabase = request.result
+            const objectStore: IDBObjectStore = db.createObjectStore('todos', { keyPath: 'ssn' })
+            objectStore.createIndex('id', 'id', { unique: true })
+
+            return db
         }
     })
 }
 
 export function createTransition (db: IDBDatabase, storeNames: string | string [], option: IDBTransactionMode = 'readwrite'): IDBTransaction {
-    console.log(storeNames, option)
     return db.transaction(storeNames, option)
 }
 

@@ -78,6 +78,7 @@ export default {
     const value = ref <string> ('')
     const todos: Todo[] = store.getters['todo/todos']
     const lastAction = ref <LastAction> (0)
+    const transactionHandler = ref <TransactionHandler> ()
 
     const addTodo = () => {
       const text = value.value
@@ -97,6 +98,8 @@ export default {
       store.dispatch('todo/addTodo',todo)
       value.value = ''
       lastAction.value = LastAction.ADD
+      const fuck = transactionHandler.value
+      console.log(fuck)
     }
 
     const deleteTodo = (todo: Todo) => {
@@ -127,8 +130,6 @@ export default {
         window.alert('You done all todo!')
       }
     })
-
-    const transactionHandler = ref(null)
 
     const initializeDatabase = async () => {
       const db = await createDatabase()
