@@ -42,7 +42,7 @@ export class DbHandler {
         this.storeName = storeName
     }
 
-    addItem (item: object) {
+    addItem <T> (item: T) {
         const { db, storeName } = this
         const objectStore: IDBObjectStore = db.transaction(storeName, 'readwrite').objectStore(storeName)
         const request = objectStore.add(item)
@@ -59,12 +59,12 @@ export class DbHandler {
         })
     }
 
-    getItems () {
+    getAllItems <T> (): PromiseLike <T[]> {
         const { db, storeName } = this
         const objectStore: IDBObjectStore = db.transaction(storeName).objectStore(storeName)
         const request: IDBRequest = objectStore.getAll()
 
-        return new Promise <object> ((resolve, reject) => {
+        return new Promise <T[]> ((resolve, reject) => {
             request.onsuccess = function () {
                 const result = request.result
                 resolve(result)
@@ -75,4 +75,38 @@ export class DbHandler {
             }
         })
     }
+
+    getItem <T> (key: IDBValidKey): PromiseLike <T> {
+        const { db, storeName } = this
+        const objectStore: IDBObjectStore = db.transaction(storeName).objectStore(storeName)
+        const request: IDBRequest = objectStore.get(key)
+
+        return new Promise <T> ((resolve, reject) => {
+            request.onsuccess = function () {
+                const result = request.result
+                resolve(result)
+            }
+
+            request.onerror = function (event) {
+                reject(event)
+            }
+        })
+    }
+
+    deleteItem (key: IDBValidKey): PromiseLike <null> {
+        const { db, storeName } = this
+        const objectStore: IDBObjectStore = db.transaction(storeName, 'readwrite').objectStore(storeName)
+        const request: IDBRequest = objectStore.delete(key)
+
+        return new Promise <null> ((resolve, reject) => {
+            request.onsuccess = function () {
+                resolve(null)
+            }
+
+            request.onerror = function (event) {
+                reject(event)
+            }
+        })
+    }
+
 }

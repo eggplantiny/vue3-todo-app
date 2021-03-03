@@ -83,8 +83,10 @@ export default {
       const db = await createDatabase()
       dbHandler.value = new DbHandler(db, 'todos')
 
-      const items = await dbHandler.value.getItems()
-      console.log(items)
+      const items = await dbHandler.value?.getAllItems<Todo>()
+      items.forEach((todo: Todo) => {
+        store.dispatch('todo/addTodo',todo)
+      })
     }
 
     onMounted(initializeDatabase)
@@ -108,19 +110,21 @@ export default {
       value.value = ''
       lastAction.value = LastAction.ADD
 
-      const items = await dbHandler.value?.addItem(todo)
-      console.log(items)
+      return dbHandler.value?.addItem(todo)
     }
 
-    const deleteTodo = (todo: Todo) => {
+    const deleteTodo = async (todo: Todo) => {
       const yes = window.confirm('Would you wanna remove this todo?')
 
       if (!yes) {
         return
       }
 
-      store.dispatch('todo/removeTodo', todo)
+      const { id } = todo
+      await store.dispatch('todo/removeTodo', todo)
       lastAction.value = LastAction.DELETE
+
+      await dbHandler.value?.deleteItem(id)
     }
 
     const toggleTodo = (todo: Todo) => {
