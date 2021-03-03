@@ -66,8 +66,7 @@ import EInput from '@/components/atoms/EInput.vue'
 
 import {
   createDatabase,
-  createTransition,
-  TransactionHandler
+  DbHandler
 } from '@/helper/database'
 
 export default {
@@ -78,9 +77,19 @@ export default {
     const value = ref <string> ('')
     const todos: Todo[] = store.getters['todo/todos']
     const lastAction = ref <LastAction> (0)
-    const transactionHandler = ref <TransactionHandler> ()
+    const dbHandler = ref <DbHandler> ()
 
-    const addTodo = () => {
+    const initializeDatabase = async () => {
+      const db = await createDatabase()
+      dbHandler.value = new DbHandler(db, 'todos')
+
+      const items = await dbHandler.value.getItems()
+      console.log(items)
+    }
+
+    onMounted(initializeDatabase)
+
+    const addTodo = async () => {
       const text = value.value
       const id = generateId()
       const done = false
@@ -95,11 +104,12 @@ export default {
         done
       }
 
-      store.dispatch('todo/addTodo',todo)
+      await store.dispatch('todo/addTodo',todo)
       value.value = ''
       lastAction.value = LastAction.ADD
-      const fuck = transactionHandler.value
-      console.log(fuck)
+
+      const items = await dbHandler.value?.addItem(todo)
+      console.log(items)
     }
 
     const deleteTodo = (todo: Todo) => {
@@ -130,14 +140,6 @@ export default {
         window.alert('You done all todo!')
       }
     })
-
-    const initializeDatabase = async () => {
-      const db = await createDatabase()
-      const transaction = await createTransition(db, ['todos'])
-      transactionHandler.value = new TransactionHandler(transaction)
-    }
-
-    onMounted(initializeDatabase)
 
     return {
       value,

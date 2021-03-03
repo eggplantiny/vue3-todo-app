@@ -5,7 +5,7 @@ if (!window.indexedDB) {
     throw Error(`Your browser doesn't support a stable version of IndexedDB. Such and such feature will not be available.`)
 }
 
-const DATABASE_NAME = 'VUE3-TODO-DATABASE'
+const DATABASE_NAME = 'VUE3-TODO-DATABASE-3'
 
 export function createDatabase (): PromiseLike<IDBDatabase> {
     const request = window.indexedDB.open(DATABASE_NAME)
@@ -15,47 +15,64 @@ export function createDatabase (): PromiseLike<IDBDatabase> {
             reject(event)
         }
 
-        request.onupgradeneeded = function () {
+        request.onsuccess = function () {
+            console.log('onsuccess')
             const db: IDBDatabase = request.result
-            const objectStore: IDBObjectStore = db.createObjectStore('todos', { keyPath: 'ssn' })
-            objectStore.createIndex('id', 'id', { unique: true })
+            resolve(db)
+        }
 
-            return db
+        request.onupgradeneeded = function () {
+            console.log('onupgradeneeded')
+            const db: IDBDatabase = request.result
+            const store: IDBObjectStore = db.createObjectStore('todos', {
+                keyPath: 'id'
+            })
+
+            store.createIndex('id', 'id', { unique: true })
         }
     })
 }
 
-export function createTransition (db: IDBDatabase, storeNames: string | string [], option: IDBTransactionMode = 'readwrite'): IDBTransaction {
-    return db.transaction(storeNames, option)
-}
+export class DbHandler {
+    private db: IDBDatabase;
+    private storeName: string;
 
-function makeRequestPromise (request: IDBRequest): PromiseLike<object> {
-    return new Promise <object> ((resolve, reject) => {
-        request.onsuccess = resolve
-        request.onerror = reject
-    })
-}
-
-export class TransactionHandler {
-    private transaction: IDBTransaction
-
-    constructor (transaction: IDBTransaction) {
-        this.transaction = transaction
+    constructor (db: IDBDatabase, storeName: string) {
+        this.db = db
+        this.storeName = storeName
     }
 
-    async addItems (storeName: string, ...items: object[]) {
-        const objectStore: IDBObjectStore = this.transaction.objectStore(storeName)
+    addItem (item: object) {
+        const { db, storeName } = this
+        const objectStore: IDBObjectStore = db.transaction(storeName, 'readwrite').objectStore(storeName)
+        const request = objectStore.add(item)
 
-        for await (const item of items) {
-            const request: IDBRequest = objectStore.add(item)
-            await makeRequestPromise(request)
-        }
+        return new Promise <IDBValidKey> ((resolve, reject) => {
+            request.onsuccess = function () {
+                const result = request.result
+                resolve(result)
+            }
+
+            request.onerror = function (event) {
+                reject(event)
+            }
+        })
     }
 
-    getItems (storeName: string) {
-        const objectStore: IDBObjectStore = this.transaction.objectStore(storeName)
-        const request: IDBRequest = objectStore.get(storeName)
+    getItems () {
+        const { db, storeName } = this
+        const objectStore: IDBObjectStore = db.transaction(storeName).objectStore(storeName)
+        const request: IDBRequest = objectStore.getAll()
 
-        return makeRequestPromise(request)
+        return new Promise <object> ((resolve, reject) => {
+            request.onsuccess = function () {
+                const result = request.result
+                resolve(result)
+            }
+
+            request.onerror = function (event) {
+                reject(event)
+            }
+        })
     }
 }
