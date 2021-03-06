@@ -65,8 +65,7 @@ import EButton from '@/components/atoms/EButton.vue'
 import EInput from '@/components/atoms/EInput.vue'
 
 import {
-  createDatabase,
-  DbHandler
+  DbSingleton
 } from '@/helper/database'
 
 export default {
@@ -77,13 +76,12 @@ export default {
     const value = ref <string> ('')
     const todos: Todo[] = store.getters['todo/todos']
     const lastAction = ref <LastAction> (0)
-    const dbHandler = ref <DbHandler> ()
+    const dbSingleton: DbSingleton = DbSingleton.getInstance()
 
     const initializeDatabase = async () => {
-      const db = await createDatabase()
-      dbHandler.value = new DbHandler(db, 'todos')
+      await dbSingleton.initialize()
+      const items = await dbSingleton.getAllItems <Todo> ('todos')
 
-      const items = await dbHandler.value?.getAllItems<Todo>()
       items.forEach((todo: Todo) => {
         store.dispatch('todo/addTodo',todo)
       })
@@ -110,7 +108,7 @@ export default {
       value.value = ''
       lastAction.value = LastAction.ADD
 
-      return dbHandler.value?.addItem(todo)
+      await dbSingleton.addItem <Todo> ('todos', todo)
     }
 
     const deleteTodo = async (todo: Todo) => {
@@ -124,7 +122,7 @@ export default {
       await store.dispatch('todo/removeTodo', todo)
       lastAction.value = LastAction.DELETE
 
-      await dbHandler.value?.deleteItem(id)
+      await dbSingleton.deleteItem('todos', id)
     }
 
     const toggleTodo = (todo: Todo) => {

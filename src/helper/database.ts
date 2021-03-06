@@ -7,7 +7,7 @@ if (!window.indexedDB) {
 
 const DATABASE_NAME = 'VUE3-TODO-DATABASE-3'
 
-export function createDatabase (): PromiseLike<IDBDatabase> {
+export function createDatabase (): Promise<IDBDatabase> {
     const request = window.indexedDB.open(DATABASE_NAME)
 
     return new Promise((resolve, reject) => {
@@ -33,17 +33,34 @@ export function createDatabase (): PromiseLike<IDBDatabase> {
     })
 }
 
-export class DbHandler {
-    private db: IDBDatabase;
-    private storeName: string;
+export class DbSingleton {
+    private static instance: DbSingleton | null = null;
+    private db: IDBDatabase | null = null;
 
-    constructor (db: IDBDatabase, storeName: string) {
-        this.db = db
-        this.storeName = storeName
+    private constructor () {
+        this.db = null
     }
 
-    addItem <T> (item: T) {
-        const { db, storeName } = this
+    public static getInstance (): DbSingleton {
+        if (this.instance === null) {
+            this.instance = new DbSingleton()
+        }
+
+        return this.instance
+    }
+
+    public async initialize (): Promise <null> {
+        this.db = await createDatabase()
+        return null
+    }
+
+    public addItem <T> (storeName: string, item: T): Promise<IDBValidKey> {
+        const { db } = this
+
+        if (db === null) {
+            throw new Error('You have to initialize indexed database')
+        }
+
         const objectStore: IDBObjectStore = db.transaction(storeName, 'readwrite').objectStore(storeName)
         const request = objectStore.add(item)
 
@@ -59,8 +76,13 @@ export class DbHandler {
         })
     }
 
-    getAllItems <T> (): PromiseLike <T[]> {
-        const { db, storeName } = this
+    getAllItems <T> (storeName: string): Promise <T[]> {
+        const { db } = this
+
+        if (db === null) {
+            throw new Error('You have to initialize indexed database')
+        }
+
         const objectStore: IDBObjectStore = db.transaction(storeName).objectStore(storeName)
         const request: IDBRequest = objectStore.getAll()
 
@@ -76,8 +98,13 @@ export class DbHandler {
         })
     }
 
-    getItem <T> (key: IDBValidKey): PromiseLike <T> {
-        const { db, storeName } = this
+    getItem <T> (storeName: string, key: IDBValidKey): Promise <T> {
+        const { db } = this
+
+        if (db === null) {
+            throw new Error('You have to initialize indexed database')
+        }
+
         const objectStore: IDBObjectStore = db.transaction(storeName).objectStore(storeName)
         const request: IDBRequest = objectStore.get(key)
 
@@ -93,8 +120,13 @@ export class DbHandler {
         })
     }
 
-    deleteItem (key: IDBValidKey): PromiseLike <null> {
-        const { db, storeName } = this
+    deleteItem (storeName: string, key: IDBValidKey): Promise <null> {
+        const { db } = this
+
+        if (db === null) {
+            throw new Error('You have to initialize indexed database')
+        }
+
         const objectStore: IDBObjectStore = db.transaction(storeName, 'readwrite').objectStore(storeName)
         const request: IDBRequest = objectStore.delete(key)
 
@@ -108,5 +140,4 @@ export class DbHandler {
             }
         })
     }
-
 }
