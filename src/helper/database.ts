@@ -5,7 +5,7 @@ if (!window.indexedDB) {
     throw Error(`Your browser doesn't support a stable version of IndexedDB. Such and such feature will not be available.`)
 }
 
-const DATABASE_NAME = 'VUE3-TODO-DATABASE-3'
+const DATABASE_NAME = 'VUE3-TODO-DATABASE-4'
 
 export function createDatabase (): Promise<IDBDatabase> {
     const request = window.indexedDB.open(DATABASE_NAME)
@@ -133,6 +133,29 @@ export class DbSingleton {
         return new Promise <null> ((resolve, reject) => {
             request.onsuccess = function () {
                 resolve(null)
+            }
+
+            request.onerror = function (event) {
+                reject(event)
+            }
+        })
+    }
+
+    updateItem <T> (storeName: string, key: IDBValidKey, item: T): Promise <IDBValidKey> {
+        console.log('fucking', item)
+        const { db } = this
+
+        if (db === null) {
+            throw new Error('You have to initialize indexed database')
+        }
+
+        const objectStore: IDBObjectStore = db.transaction(storeName, 'readwrite').objectStore(storeName)
+        const request: IDBRequest = objectStore.put(item)
+
+        return new Promise <IDBValidKey> ((resolve, reject) => {
+            request.onsuccess = function () {
+                const result = request.result
+                resolve(result)
             }
 
             request.onerror = function (event) {

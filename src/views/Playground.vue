@@ -76,16 +76,8 @@ export default {
     const value = ref <string> ('')
     const todos: Todo[] = store.getters['todo/todos']
     const lastAction = ref <LastAction> (0)
-    const dbSingleton: DbSingleton = DbSingleton.getInstance()
 
-    const initializeDatabase = async () => {
-      await dbSingleton.initialize()
-      const items = await dbSingleton.getAllItems <Todo> ('todos')
-
-      items.forEach((todo: Todo) => {
-        store.dispatch('todo/addTodo',todo)
-      })
-    }
+    const initializeDatabase = () => store.dispatch('todo/initialize')
 
     onMounted(initializeDatabase)
 
@@ -93,6 +85,7 @@ export default {
       const text = value.value
       const id = generateId()
       const done = false
+      const date = new Date()
 
       if (text.length === 0) {
         return window.alert('Please enter todo.')
@@ -101,14 +94,13 @@ export default {
       const todo: Todo = {
         text,
         id,
-        done
+        done,
+        date
       }
 
       await store.dispatch('todo/addTodo',todo)
       value.value = ''
       lastAction.value = LastAction.ADD
-
-      await dbSingleton.addItem <Todo> ('todos', todo)
     }
 
     const deleteTodo = async (todo: Todo) => {
@@ -118,15 +110,12 @@ export default {
         return
       }
 
-      const { id } = todo
       await store.dispatch('todo/removeTodo', todo)
       lastAction.value = LastAction.DELETE
-
-      await dbSingleton.deleteItem('todos', id)
     }
 
-    const toggleTodo = (todo: Todo) => {
-      store.dispatch('todo/toggleTodo', todo)
+    const toggleTodo = async (todo: Todo) => {
+      await store.dispatch('todo/toggleTodo', todo)
       lastAction.value = LastAction.TOGGLE
     }
 
