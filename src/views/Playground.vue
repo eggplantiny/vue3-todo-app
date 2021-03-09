@@ -1,6 +1,6 @@
 <template>
   <section>
-    <div class="d-flex">
+    <div class="flex mt-4">
       <e-input
         v-model="value"
         class="mr-2"
